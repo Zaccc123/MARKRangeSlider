@@ -27,8 +27,9 @@ static NSString * const kMARKRangeSliderTrackRangeImage = @"rangeSliderTrackRang
 {
     self = [super initWithFrame:frame];
     if (self) {
-        [self setDefaults];
         [self setUpViewComponents];
+        [self setDefaults];
+
     }
     return self;
 }
@@ -37,8 +38,8 @@ static NSString * const kMARKRangeSliderTrackRangeImage = @"rangeSliderTrackRang
 {
     self = [super initWithCoder:aDecoder];
     if (self) {
-        [self setDefaults];
         [self setUpViewComponents];
+        [self setDefaults];
     }
     return self;
 }
@@ -52,12 +53,18 @@ static NSString * const kMARKRangeSliderTrackRangeImage = @"rangeSliderTrackRang
     self.leftValue = self.minimumDistance;
     self.rightValue = self.maximumValue;
     self.minimumDistance = 0.2f;
+    
+    self.leftLabel.text = [NSString stringWithFormat:@"%.2f",self.leftValue];
+    [self.leftLabel sizeToFit];
+    
+    self.rightLabel.text = [NSString stringWithFormat:@"%.2f",self.rightValue];
+    [self.rightLabel sizeToFit];
 }
 
 - (void)setUpViewComponents
 {
     self.multipleTouchEnabled = YES;
-
+    
     // Init track image
     self.trackImageView = [[UIImageView alloc] initWithImage:self.trackImage];
     [self addSubview:self.trackImageView];
@@ -71,7 +78,18 @@ static NSString * const kMARKRangeSliderTrackRangeImage = @"rangeSliderTrackRang
     self.leftThumbImageView.userInteractionEnabled = YES;
     self.leftThumbImageView.contentMode = UIViewContentModeCenter;
     [self addSubview:self.leftThumbImageView];
+    
+    //add left label
+    self.leftLabel = [[UILabel alloc]initWithFrame:self.leftThumbImageView.frame];
+    self.leftLabel.textColor = [UIColor whiteColor];
+    [self addSubview:self.leftLabel];
+    
+    //add right label
+    self.rightLabel = [[UILabel alloc]initWithFrame:self.rightThumbImageView.frame];
+    self.rightLabel.textColor = [UIColor whiteColor];
+    [self addSubview:self.rightLabel];
 
+    
     // Add left pan recognizer
     UIPanGestureRecognizer *leftPanRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handleLeftPan:)];
     [self.leftThumbImageView addGestureRecognizer:leftPanRecognizer];
@@ -140,7 +158,7 @@ static NSString * const kMARKRangeSliderTrackRangeImage = @"rangeSliderTrackRang
         trackWidth -= leftInset + rightInset;
     }
     self.trackImageView.frame = CGRectMake(trackX, trackY, trackWidth, trackHeight);
-
+    
     // Set range frame
     CGFloat rangeWidth = rightX - leftX;
     if (self.disableOverlapping) {
@@ -156,6 +174,14 @@ static NSString * const kMARKRangeSliderTrackRangeImage = @"rangeSliderTrackRang
     }
     self.leftThumbImageView.center = CGPointMake(leftX, height / 2);
     self.rightThumbImageView.center = CGPointMake(rightX, height / 2);
+    
+    self.leftLabel.text = [NSString stringWithFormat:@"%d",(int)self.leftValue];
+    [self.leftLabel sizeToFit];
+    self.leftLabel.center = CGPointMake(leftX, height*2);
+    
+    self.rightLabel.text = [NSString stringWithFormat:@"%d",(int)self.rightValue];
+    [self.rightLabel sizeToFit];
+    self.rightLabel.center = CGPointMake(rightX, height*2);
 }
 
 #pragma mark - Gesture recognition
@@ -165,7 +191,8 @@ static NSString * const kMARKRangeSliderTrackRangeImage = @"rangeSliderTrackRang
     if (gesture.state == UIGestureRecognizerStateBegan || gesture.state == UIGestureRecognizerStateChanged) {
         //Fix when minimumDistance = 0.0 and slider is move to 1.0-1.0
         [self bringSubviewToFront:self.leftThumbImageView];
-
+        [self bringSubviewToFront:self.leftLabel];
+        
         CGPoint translation = [gesture translationInView:self];
         CGFloat trackRange = self.maximumValue - self.minimumValue;
         CGFloat width = CGRectGetWidth(self.frame) - CGRectGetWidth(self.leftThumbImageView.frame);

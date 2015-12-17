@@ -21,4 +21,8 @@
 @property (nonatomic) UIImage *leftThumbImage;
 @property (nonatomic) UIImage *rightThumbImage;
 
+@property (nonatomic) UILabel *leftLabel;
+@property (nonatomic) UILabel *rightLabel;
+
+
 @end
